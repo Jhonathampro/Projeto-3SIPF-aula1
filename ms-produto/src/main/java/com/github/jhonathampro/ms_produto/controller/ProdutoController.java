@@ -3,6 +3,7 @@ package com.github.jhonathampro.ms_produto.controller;
 
 import com.github.jhonathampro.ms_produto.dto.ProdutoDTO;
 import com.github.jhonathampro.ms_produto.service.ProdutoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<ProdutoDTO> createProduto(@RequestBody ProdutoDTO produtoDTO){
+    public ResponseEntity<ProdutoDTO> createProduto(@RequestBody @Valid ProdutoDTO produtoDTO){
           produtoDTO = produtoService.saveProduto(produtoDTO);
 
           URI uri = ServletUriComponentsBuilder
@@ -48,7 +49,7 @@ public class ProdutoController {
     }
 
     @PutMapping("/{id}")
-   public ResponseEntity<ProdutoDTO> update(@PathVariable long id,@RequestBody ProdutoDTO produtoDTO){
+   public ResponseEntity<ProdutoDTO> updateProduto(@PathVariable long id,@RequestBody @Valid ProdutoDTO produtoDTO){
 
       produtoDTO = produtoService.updateProduto(id, produtoDTO);
 

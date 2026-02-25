@@ -2,6 +2,7 @@ package com.github.jhonathampro.ms_produto.service;
 
 import com.github.jhonathampro.ms_produto.dto.ProdutoDTO;
 import com.github.jhonathampro.ms_produto.entites.Produto;
+import com.github.jhonathampro.ms_produto.exceptions.ResourceNotFoundExeption;
 import com.github.jhonathampro.ms_produto.repositores.ProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class ProdutoService {
     public ProdutoDTO findProdutoById(Long id){
 
         Produto produto = produtoRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Recurso não encontrado. ID: " + id)
+                () -> new ResourceNotFoundExeption("Recurso não encontrado. ID: " + id)
         );
 
         return new ProdutoDTO(produto);
@@ -53,7 +54,7 @@ public class ProdutoService {
             return new ProdutoDTO(produto);
         }
         catch (EntityNotFoundException e) {
-            throw new EntityNotFoundException("Recurso não encontrado. ID: " + id);
+            throw new ResourceNotFoundExeption("Recurso não encontrado. ID: " + id);
         }
     }
 
@@ -61,7 +62,7 @@ public class ProdutoService {
     public void deleteProdutoByld(Long id){
 
         if(!produtoRepository.existsById(id)){
-            throw new EntityNotFoundException("Recurso não encontrado. ID: " + id);
+            throw new ResourceNotFoundExeption("Recurso não encontrado. ID: " + id);
         }
         produtoRepository.deleteById(id);
     }
