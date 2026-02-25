@@ -1,35 +1,65 @@
 package com.github.jhonathampro.ms_produto.controller;
 
 
-import com.github.jhonathampro.ms_produto.dto.ProdutoInputDTO;
-import com.github.jhonathampro.ms_produto.dto.ProdutoResponseDTO;
-import com.github.jhonathampro.ms_produto.entites.Produto;
+import com.github.jhonathampro.ms_produto.dto.ProdutoDTO;
+import com.github.jhonathampro.ms_produto.service.ProdutoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
 
-    @PostMapping
-    public ResponseEntity<ProdutoResponseDTO> createProduto(
-            @RequestBody ProdutoInputDTO inputDTO) {
+  @Autowired
+    private ProdutoService produtoService;
 
-        ProdutoResponseDTO dto = new ProdutoResponseDTO(1L,
-                inputDTO.getNome(), inputDTO.getDescricao(), inputDTO.getValor());
+  @GetMapping
+    public ResponseEntity<List<ProdutoDTO>> getALLProdutos(){
 
-        return ResponseEntity.created(null).body(dto);
+      List<ProdutoDTO> list = produtoService.findAllProduto();
+
+      return ResponseEntity.ok(list);
+  }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProdutoDTO> getProdutoById(@PathVariable Long id){
+
+        ProdutoDTO produtoDTO = produtoService.findProdutoById(id);
+
+        return ResponseEntity.ok(produtoDTO);
     }
 
-    /*
-        List <Produto> produtos = new ArrayList<>();
-        produtos.add( new Produto(1L, "Smart TV", "Smart TV LED 50 polegadas", 2285.0));
-        produtos.add( new Produto(2L, "Mouse", "Mouse sem fio", 250.0));
-        produtos.add( new Produto(3L, "Teclado", "Teclado sem fio", 1350.0));
-        return ResponseEntity.ok(produtos);
+    @PostMapping
+    public ResponseEntity<ProdutoDTO> createProduto(@RequestBody ProdutoDTO produtoDTO){
+          produtoDTO = produtoService.saveProduto(produtoDTO);
 
-     */
+          URI uri = ServletUriComponentsBuilder
+                  .fromCurrentRequestUri()
+                  .path("/{id}")
+                  .buildAndExpand(produtoDTO.getId())
+                  .toUri();
+
+          return  ResponseEntity.created(uri).body(produtoDTO);
+    }
+
+    @PutMapping("/{id}")
+   public ResponseEntity<ProdutoDTO> update(@PathVariable long id,@RequestBody ProdutoDTO produtoDTO){
+
+      produtoDTO = produtoService.updateProduto(id, produtoDTO);
+
+      return  ResponseEntity.ok(produtoDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduto(@PathVariable long id){
+
+       produtoService.deleteProdutoByld(id);
+
+       return ResponseEntity.noContent().build();
+    }
 }
