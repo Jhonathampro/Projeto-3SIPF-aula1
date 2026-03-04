@@ -3,26 +3,26 @@ package com.github.jhonathampro.ms_produto.entites;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Getter
 @Setter
-@EqualsAndHashCode(of = "id")
 @Entity
-@Table(name = "tb_produto")
-public class Produto {
-
+@Table(name = "tb_categoria")
+public class Categoria{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String nome;
-    private String descricao;
-    private double valor;
-
 
     //Relacionamento
-    @ManyToOne
-    @JoinColumn(name = "categoira_id", nullable = false)
-    private Categoria categoria;
+    @OneToMany(mappedBy = "categoria")
+    private List<Produto> produtos = new ArrayList<>();
 
 }
+
+

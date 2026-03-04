@@ -1,5 +1,6 @@
 package com.github.jhonathampro.ms_produto.dto;
 
+import com.github.jhonathampro.ms_produto.entites.Categoria;
 import com.github.jhonathampro.ms_produto.entites.Produto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,10 +28,16 @@ public class ProdutoDTO {
     @Positive(message = "O campo valor deve ser um número positivo maior que zero")
     private Double valor;
 
+    @NotNull(message = "Campo categoria é requerido")
+    private CategoriaDTO categoria;
+
     public ProdutoDTO(Produto produto) {
         id = produto.getId();
         nome = produto.getNome();
         descricao = produto.getDescricao();
         valor = produto.getValor();
+        categoria = new CategoriaDTO(produto.getCategoria());
     }
+
+
 }
