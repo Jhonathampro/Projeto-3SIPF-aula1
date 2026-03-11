@@ -22,7 +22,7 @@ public class Produto {
 
     //Relacionamento
     @ManyToOne
-    @JoinColumn(name = "categoira_id", nullable = false)
+    @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
 }
