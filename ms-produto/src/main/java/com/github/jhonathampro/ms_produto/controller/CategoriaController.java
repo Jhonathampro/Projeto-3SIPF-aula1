@@ -41,6 +41,20 @@ public class CategoriaController {
 
     }
 
+    @PostMapping
+    public ResponseEntity<CategoriaDTO> createCategoria(@RequestBody @Valid CategoriaDTO categoriaDto) {
+
+        categoriaDto = categoriaService.saveCategoria(categoriaDto);
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .path("/{id}")
+                .buildAndExpand(categoriaDto.getId())
+                .toUri();
+
+        return ResponseEntity.created(uri).body(categoriaDto);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<CategoriaDTO> updateCategoria(@PathVariable Long id,
                                                         @RequestBody @Valid CategoriaDTO categoriaDTO){
