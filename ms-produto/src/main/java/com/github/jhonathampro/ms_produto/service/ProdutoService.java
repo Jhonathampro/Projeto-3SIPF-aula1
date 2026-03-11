@@ -1,11 +1,15 @@
 package com.github.jhonathampro.ms_produto.service;
 
 import com.github.jhonathampro.ms_produto.dto.ProdutoDTO;
+import com.github.jhonathampro.ms_produto.entites.Categoria;
 import com.github.jhonathampro.ms_produto.entites.Produto;
+import com.github.jhonathampro.ms_produto.exceptions.DatabaseException;
 import com.github.jhonathampro.ms_produto.exceptions.ResourceNotFoundExeption;
+import com.github.jhonathampro.ms_produto.repositores.CategoriaRepository;
 import com.github.jhonathampro.ms_produto.repositores.ProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +17,9 @@ import java.util.List;
 
 @Service
 public class ProdutoService {
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
     @Autowired
     private ProdutoRepository produtoRepository;
@@ -39,9 +46,14 @@ public class ProdutoService {
     public ProdutoDTO saveProduto(ProdutoDTO produtoDTO){
         Produto produto = new Produto();
 
-        copyDtoToProduto(produtoDTO, produto);
-        produto = produtoRepository.save(produto);
-        return new ProdutoDTO(produto);
+        try {
+            copyDtoToProduto(produtoDTO, produto);
+            produto = produtoRepository.save(produto);
+            return new ProdutoDTO(produto);
+        }catch (DataIntegrityViolationException e){
+            throw new DatabaseException("Não foi possivel salvar esse produto. categoria inesistente" +
+                    "(id: " + produtoDTO.getCategoria().getId() + ")" );
+        }
     }
 
     @Transactional
@@ -72,6 +84,10 @@ public class ProdutoService {
          produto.setNome(produtoDTO.getNome());
          produto.setDescricao(produtoDTO.getDescricao());
          produto.setValor(produtoDTO.getValor());
+
+         Categoria categoria =  categoriaRepository.getReferenceById(produtoDTO.getCategoria().getId());
+
+         produto.setCategoria(categoria);
     }
 
 

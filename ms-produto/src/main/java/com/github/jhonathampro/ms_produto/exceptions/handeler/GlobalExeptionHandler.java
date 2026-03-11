@@ -1,5 +1,6 @@
 package com.github.jhonathampro.ms_produto.exceptions.handeler;
 
+import com.github.jhonathampro.ms_produto.exceptions.DatabaseException;
 import com.github.jhonathampro.ms_produto.exceptions.ResourceNotFoundExeption;
 import com.github.jhonathampro.ms_produto.exceptions.dto.CustomErrorDTO;
 import com.github.jhonathampro.ms_produto.exceptions.dto.ValidationErrorDTO;
@@ -72,17 +73,43 @@ public class GlobalExeptionHandler {
     }
 
     // 500 - fallback para qualquer erro não tratado
-    @ExceptionHandler(Exception.class)
+   // @ExceptionHandler(Exception.class)
 
-    public ResponseEntity<CustomErrorDTO> handleGenericExcepetion(Exception e,
-                                                                  HttpServletRequest request){
-        HttpStatus status =  HttpStatus.INTERNAL_SERVER_ERROR;
-        CustomErrorDTO err = new CustomErrorDTO(
-                Instant.now(), status.value(),
-                "erro interno inseperado.",request.getRequestURI());
+  //  public ResponseEntity<CustomErrorDTO> handleGenericExcepetion(Exception e,
+     //                                                             HttpServletRequest request){
+   //     HttpStatus status =  HttpStatus.INTERNAL_SERVER_ERROR;
+     //   CustomErrorDTO err = new CustomErrorDTO(
+    //            Instant.now(), status.value(),
+     //           "erro interno inseperado.",request.getRequestURI());
+
+   //     return ResponseEntity.status(status).body(err);
+  //  };
+
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<CustomErrorDTO> handleDatabase(DatabaseException e,
+                                                         HttpServletRequest request){
+
+        HttpStatus status = HttpStatus.CONFLICT; //409
+        CustomErrorDTO err = new CustomErrorDTO(Instant.now(), status.value(),
+                e.getMessage(), request.getRequestURI());
 
         return ResponseEntity.status(status).body(err);
-    };
+    }
+
+    // 500 - fallback para qualquer erro não tratado
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<CustomErrorDTO> handleGenericException(Exception e,
+                                                                 HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR; // 500
+        CustomErrorDTO err = new CustomErrorDTO(
+                Instant.now(), status.value(),
+                "Erro interno inesperado.",
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(err);
+    }
 
 
 

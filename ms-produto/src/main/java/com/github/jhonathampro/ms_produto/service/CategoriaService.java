@@ -2,11 +2,14 @@ package com.github.jhonathampro.ms_produto.service;
 
 import com.github.jhonathampro.ms_produto.dto.CategoriaDTO;
 import com.github.jhonathampro.ms_produto.entites.Categoria;
+import com.github.jhonathampro.ms_produto.exceptions.DatabaseException;
 import com.github.jhonathampro.ms_produto.exceptions.ResourceNotFoundExeption;
 import com.github.jhonathampro.ms_produto.repositores.CategoriaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -46,7 +49,7 @@ public class CategoriaService {
     }
 
     @Transactional
-    public CategoriaDTO upadteCategoria(Long id, CategoriaDTO inputDto){
+    public CategoriaDTO updateCategoria(Long id, CategoriaDTO inputDto){
 
         try{
             Categoria categoria = categoriaRepository.getReferenceById(id);
@@ -59,12 +62,20 @@ public class CategoriaService {
 
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void deleteCategoiraById(Long id){
         if(!categoriaRepository.existsById(id)){
             throw new ResourceNotFoundExeption("Recurso não encontrado. ID: " + id);
 
         }
-        categoriaRepository.deleteById(id);
+
+        try {
+            categoriaRepository.deleteById(id);
+        }catch (DataIntegrityViolationException e){
+            throw new DatabaseException("Não foi possivel excluir a catgoria" +
+                   "Exitem produtos associados a ela." );
+        }
+
+
     }
 }
